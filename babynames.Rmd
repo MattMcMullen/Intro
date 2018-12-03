@@ -1,0 +1,421 @@
+---
+title: "Baby names"
+output: html_notebook
+---
+
+
+Note: Get unisex names. (Is it possible to find the names that are the most unisex? Highest prop in both M and F.)
+Add props together, rank them.
+
+
+
+The slightly darker space below is called a "chunk" and is for your R commands. 
+
+Below the two lines with library(tidyverse) and library(wordcloud2) below type the line 'library(babynames)' just as it appears but without the quotes. 
+
+Then press the little green arrow in the top right of the chunk to run everything. 
+
+
+```{r}
+library(tidyverse)
+library(wordcloud2)
+library(babynames)
+
+```
+
+The package 'babynames' has data on children's names from the Social Security Administration.
+
+First let's look at the data by typing in the name of the package in the chunk below.
+
+In the space below, type View(babynames). Then press the little green arrow at the top right of the chunk. Make sure you pay attention to uppercase and lowercase!
+```{r}
+View(babynames)
+```
+
+
+There are variables for year, sex, name, n (the total number of people give that name that year), and prop (the percentage of people of that sex given that name that year).
+
+Notice that there are almost 2 million rows in the dataset! 
+
+One way to look at just the first part of a dataset is to use head(). First, create a chunk by clicking so the cursor is below this text, and then go to the menu and find Code and then Insert Chunk. Then type head(babynames) and click the Run arrow.
+
+
+
+
+
+
+
+
+You can also view the last several rows of a dataset with tail(). Create another chunk below, this time using Insert->R in the mini-menu just above and to the right (it does exactly the same thing as Code->Insert Chunk), and then use tail() to see the last several rows.
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+You can see the dataset ends in 2015 (at least it did when I wrote this in late 2018).
+
+
+One final way to look at a dataset that you should know is with str(). It will show the structure of the data: How many observations (rows), how many variables (columns), and the first several rows of each variable.
+```{r}
+str(babynames)
+```
+
+
+
+
+
+If you want to see the names for just one year, use filter(). The filter() command will find rows based on some condition, like a year or the sex of a name. Run the chunk below:
+
+```{r}
+filter(babynames, year == 1900)
+```
+
+
+A better way to run filter() uses a command from the tidyverse called the 'pipe,' which is this funny set of symbols: %>%  It's the percent symbol followed by the greater than symbol followed by another percent. An easy way to type it in R Studio is with control-shift-m (or command-shift-m). When you see the pipe, think "and then." So the following command says: take the babynames data, AND THEN filter it to the year 1900. It takes the first part, babynames, and sends it to the next part, filter(). Taking babynames out of the parentheses in filter() can make the command a little easier to read, especially when we start using longer sequences of commands.
+
+
+```{r}
+babynames %>% 
+  filter(year == 1900)
+```
+
+The chunk above does exactly the same thing as the previous.
+
+Look at the names: A few of the names are still popular today, but many are not.
+
+To see the top names, of both sexes, use top_n(). top_n(10, prop) will give you the top 10 with the largest proportion of names.
+
+```{r}
+babynames %>%
+  filter(year == 1900) %>% 
+  top_n(10, prop)
+```
+
+This table groups the names weirdly. The male and female names are separate, and the proportions don't go in order. To arrange them in order, use arrange(). And let's change from prop, the proportion of same-sex babies with that name, to n, the raw number of babies with that name.
+```{r}
+babynames %>%
+  filter(year == 1900) %>% 
+  top_n(10, n) %>% 
+  arrange(n)
+```
+
+Now they are arranged from lowest to highest. It probably makes more sense to arrange from highest to lowest. Copy and paste the chunk above, but simply put a minus sign in front of n, like this: arrange(-n). That will sort the names in descending order.
+
+
+
+
+If we want to look only at baby girl names, we can add it to our filter. Note that we have to put letters like "F" in quotes, but numbers don't need quotes.
+
+
+```{r}
+babynames %>%
+  filter(year == 1900, sex == "F") %>% 
+  top_n(10, n)
+```
+
+
+
+Create a code chunk below and find the top 10 names for your sex and the year you were born (or choose some other name if you prefer). 
+
+
+
+
+
+A handy command is mutate(). It creates a new variable. The prop variable is a little hard to read because of the decimal point, so converting it to a percent might make it more readable.
+
+```{r}
+babynames %>%
+  filter(year == 1966, sex == "M") %>% 
+  mutate(percent = prop * 100) %>% 
+  top_n(10, prop)
+```
+
+
+One more change to simplify the way it looks: Use round() to get rid of some of the extra digits. Specify 1 digit to the right of the decimal place:
+```{r}
+babynames %>%
+  filter(year == 1966, sex == "M") %>% 
+  mutate(percent = round(prop * 100, 1)) %>% 
+  top_n(10, prop)
+```
+
+
+Another function is row_number(), which is useful here because row number corresponds to the popularity rank of the name.
+The following uses mutate to create a new variable called 'rank' which is set to be equal to the row number of the name.
+
+
+```{r}
+babynames %>%                                   # start with the data set
+  filter(year == 1966, sex == "M") %>%          # choose only the year you want
+  mutate(percent = round(prop * 100, 1)) %>%    # convert prop to percent
+  mutate(rank = row_number())                   # mutate() creates a new variable and calls it rank
+```
+
+
+We can use this rank variable as a measure of the popularity of a particular name. If I want to see how popular Matthew was in 1966, I add another filter() command for my name:
+
+```{r}
+
+babynames %>%                             
+  filter(year == 1966, sex == "M") %>%    
+  mutate(rank = row_number()) %>%         
+  mutate(percent = round(prop * 100, 1)) %>% 
+  filter(name == "Matthew")               
+
+```
+
+This shows that Matthew was the 34th most popular boy name in 1966, with 10,809 other babies named Matthew for less than 1% of babies.
+
+Try this with a few other names, years, and sexes.
+
+
+
+
+
+**Word clouds**
+
+A cute graphic for seeing the popularity of words is called a word cloud. It shows words (names in this case) sized by how often they occur.
+
+```{r}
+babynames %>%
+  filter(year == 2015) %>%     # use only one year
+  filter(sex == "F") %>%       # use only one sex
+  select(name, n) %>%          # select the two relevant variables: the name and how often it occurs
+  top_n(100, n) %>%            # use only the top names or it could get too big
+  wordcloud2()                 # generate the word cloud
+```
+
+
+
+
+There are supposed to be 100 names in a semi-circle, but I see fewer than that and no circle. The font is too big to show the whole thing. Make the font size smaller with 'size =' in wordcloud2.
+
+```{r}
+babynames %>%
+  filter(year == 2015) %>%     # use only one year
+  filter(sex == "F") %>%       # use only one sex
+  select(name, n) %>%          # select the two relevant variables: the name and how often it occurs
+  top_n(100, n) %>%            # use only the top names or it could get too big
+  wordcloud2(size = .5)        # generate the word cloud at a font size of .5
+```
+
+
+That looks better. Hover over a name and it will show the name and how many babies were given that name that year. Click run again and it will generate a slightly different picture each time.
+
+
+Some other parameters you can change include shape and color. Set shape = "star" or "triangle" or "pentagon" or "diamond" or "star." Set color = "pink" or "blue" etc.
+
+
+```{r}
+babynames %>%
+  filter(year == 2015) %>%     # use only one year
+  filter(sex == "F") %>%       # use only one sex
+  select(name, n) %>%          # select the two relevant variables: the name and how often it occurs
+  top_n(100, n) %>%            # use only the top names or it could get too big
+  wordcloud2(size = .5, shape = "pentagon", color = "pink")        
+```
+
+
+
+Copy and paste the chunk above to make one of your own with a different year and/or sexes, and try a different shape and color (that last one was pretty ugly).
+
+
+
+
+
+
+
+
+wordcloud2 also comes with a few different themes, or styles. Use + and then WCtheme(1), WCtheme(2), or WCtheme(3) to see what they look like:
+
+```{r}
+babynames %>%
+  filter(year == 2015) %>%     # use only one year
+  filter(sex == "F") %>%       # use only one sex
+  select(name, n) %>%          # select the two relevant variables: the name and how often it occurs
+  top_n(100, n)  %>%           # use only the top names or it could get too big
+  wordcloud2(size = .5) + WCtheme(2)    # generate the word cloud and add theme 1, 2, or 3
+
+```
+
+
+Create a word cloud with a year and sex of your choice, size = .5, red colored words, a square shape, and theme 1.
+
+
+
+
+
+
+
+**Graphing changes in popularity over time**
+
+We can also look at a specific name's popularity over time. ggplot is the most common graphing package in R, and it is also part of the tidyverse. Here's one way to use it. Start with the data, then filter for just one name, then create the plot with aes ("aesthetics") set so the x-axis is year and the y is the proportion of names. Then use the + to add the line "geometry" with geom_line. 
+
+```{r}
+babynames %>%
+  filter(name == "Matthew") %>% 
+  ggplot(aes(x = year, y = prop)) +
+  geom_line()
+
+```
+
+It's weird that the line zig-zags back and forth most years from a number and then back down to 0. That's because girls aren't named Matthew, so we're getting a number for the boys but a 0 for the girls each year. If you add sex == "M" to the filter it looks normal:
+
+```{r}
+babynames %>%                                    # start with the data
+  filter(name == "Matthew", sex == "M") %>%      # choose the name and sex
+  ggplot(aes(x = year, y = prop)) +              # put year on the x-axis and prop (proportion) on y
+  geom_line()                                    # make it a line graph 
+
+```
+
+
+Two final changes: 1. Mutate the prop variable into percent as above, and then use that as the y-axis, and 2. color the line blue.
+
+```{r}
+babynames %>%                                    # start with the data
+  filter(name == "Matthew", sex == "M") %>%      # choose the name and sex
+  mutate(percent = round(prop * 100, 1)) %>%     # create a new variable called percent
+  ggplot(aes(x = year, y = percent)) +           # put year on the x-axis and prop (proportion) on y
+  geom_line(color = "blue")                      # make it a line graph and give the line a color
+
+```
+
+
+
+
+I was born in 1966, and my name had increased in popularity about a decade before I was born, and then began to drop off in popularity about 15 years later. At its peak, over 2% of baby boys were named Matthew.
+
+Just out of curiousity I wanted to see if there were any girls named Matthew. I changed sex == "F" and I also changed y = n (so the y-axis was n, or the number of babies with that name), to see the absolute number of girls named Matthew rather than the proportion or percentage.
+
+```{r}
+babynames %>%
+  filter(name == "Matthew", sex == "F") %>% 
+  ggplot(aes(x = year, y = n)) +
+  geom_line()
+```
+
+
+
+
+
+During the 1970s and 1980s, a couple hundred girls each year were named Matthew! I wonder how many were really girls and how many of those were just errors in data coding. Did that many parents really name their girls Matthew?
+
+
+
+My wife's name is Michele (with one 'l'), and her named peaked right around the time she was born:
+
+```{r}
+babynames %>%
+  filter(name == "Michele", sex == "F") %>% 
+  mutate(percent = round(prop * 100, 1)) %>%
+  ggplot(aes(x = year, y = percent)) +
+  geom_line()
+```
+
+
+Let's look at both of my daughter's names in one graph. In filter(), I put both of their names separated by the |, which is a symbol for OR. Then I set color = name, so the two names will have different color lines.
+
+```{r}
+babynames %>%
+  filter(name == "Emma" | name == "Julia", sex == "F") %>%  
+  mutate(percent = round(prop * 100, 1)) %>%  
+  ggplot(aes(x = year, y = percent, color = name)) +
+  geom_line()
+```
+
+Their names both had a peak around the time they were born (1999 and 2003), but they were both also popular over 100 years ago. In fact, my daughter Emma was named after my wife's great-grandmother.
+
+
+Is it possible to guess the year someone was born by their name? One way to do this is to get the peak year for that name:
+
+```{r}
+babynames %>%                                     # Start with the dataset
+  filter(name == "Michele", sex == "F") %>%       # only look at the name you want
+  top_n(1, prop) %>%                              # get the top row by prop to get the most popular year for that name
+
+```
+
+My wife was born in 1968, so that's a pretty good guess!
+
+
+Let's get the top 10 years for Matthew, and sort them in descending order with arrange(). 
+
+```{r}
+babynames %>%                                     # Start with the dataset
+  filter(name == "Matthew", sex == "M") %>%       # only look at the name you want
+  top_n(10, prop) %>%                              # get the top row by prop to get the most popular year for that name
+  arrange(-prop)
+
+```
+
+The peak "Matthew" year was 1983, followed by years mostly right around that same time.
+
+
+Copy and paste the chunk above and try a few different names and sexes. Could you have guessed when people you know were born?
+
+
+
+
+
+Some names become popular when there is a famous person with that name. See how Barack was non-existent prior to 2007, peaked the year he became president, and then dropped off again.
+```{r}
+
+babynames %>%
+  filter(name == "Barack") %>% 
+  ggplot(aes(x = year, y = n)) +
+  geom_line()
+
+```
+
+The Disney movie The Little Mermaid came out in 1989 with Ariel its star character, Aladdin with Princess Jasmine came out in 1992, and Frozen with Elsa came out in 2013.
+
+```{r}
+babynames %>%
+  filter(name == "Ariel" | name == "Elsa" | name == "Jasmine") %>% 
+  filter(sex == "F") %>% 
+  ggplot(aes(x = year, y = n, color = name)) +
+  geom_line()
+```
+
+To get a better look at this, add another line to filter for years only after 1980, with filter(year > 1980).
+
+```{r}
+babynames %>%
+  filter(name == "Ariel" | name == "Elsa" | name == "Jasmine") %>% 
+  filter(sex == "F") %>% 
+  filter(year > 1980) %>% 
+  ggplot(aes(x = year, y = n, color = name)) +
+  geom_line()
+```
+
+
+It looks like Ariel peaked in popularity a few years after Little Mermaid came out in 1989, and Jasmine was very popular around the time Aladdin came out in 1992. Elsa never really became popular, but the movie came out in 2013 and the dataset ends in 2015. Maybe we're about to have a bumper crop of Elsas.
+
+
+
+
+
+
+
+
+
+Assignment: Create a new R Notebook and create a report about your name. You may use someone else's name if you prefer. To do this, click on the File -> New File -> R Notebook menu. Feel free to copy and paste between this notebook and your new project.
+
+In the white space around the chunks of code, write a brief description of the analysis and what the results show.
+
+1. Determine its rank the year you were born.  
+2. Create a word cloud of the names of your sex and the year you were born.  
+3. Graph its popularity over time.  
+4. Create a table showing which years it was most popular.  
+5. Graph its popularity in comparison to another name or two (e.g., a sibling, friend, etc.).
+
+
+
+
