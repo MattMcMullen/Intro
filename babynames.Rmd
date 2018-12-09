@@ -3,67 +3,48 @@ title: "Baby names"
 output: html_notebook
 ---
 
+This is a notebook. You can type text in this white space. The slightly darker space below is called a "chunk" and is for your R code. 
 
-Note: Get unisex names. (Is it possible to find the names that are the most unisex? Highest prop in both M and F.)
-Add props together, rank them.
-
-
-
-The slightly darker space below is called a "chunk" and is for your R commands. 
-
-Below the two lines with library(tidyverse) and library(wordcloud2) below type the line 'library(babynames)' just as it appears but without the quotes. 
+Below the two lines with library(tidyverse) and library(wordcloud2) type the following line: library(babynames)  
 
 Then press the little green arrow in the top right of the chunk to run everything. 
-
 
 ```{r}
 library(tidyverse)
 library(wordcloud2)
-library(babynames)
 
 ```
 
 The package 'babynames' has data on children's names from the Social Security Administration.
 
-First let's look at the data by typing in the name of the package in the chunk below.
+First let's look at the data by typing in the name of the package in the chunk below. Then press the little green arrow at the top right of the chunk.
 
-In the space below, type View(babynames). Then press the little green arrow at the top right of the chunk. Make sure you pay attention to uppercase and lowercase!
 ```{r}
-View(babynames)
+
 ```
 
+Another way to view it with View(). Create a code chunk below by clicking the Code menu, and then Insert Chunk. Then type View(babnames). Make sure you pay attention to uppercase and lowercase!
 
-There are variables for year, sex, name, n (the total number of people give that name that year), and prop (the percentage of people of that sex given that name that year).
+
+
+
+
+
+
+There are variables for year, sex, name, n (the total number of people of that sex given that name that year), and prop (the proportion of people of that sex given that name that year).
 
 Notice that there are almost 2 million rows in the dataset! 
 
-One way to look at just the first part of a dataset is to use head(). First, create a chunk by clicking so the cursor is below this text, and then go to the menu and find Code and then Insert Chunk. Then type head(babynames) and click the Run arrow.
-
-
-
-
-
-
-
-
-You can also view the last several rows of a dataset with tail(). Create another chunk below, this time using Insert->R in the mini-menu just above and to the right (it does exactly the same thing as Code->Insert Chunk), and then use tail() to see the last several rows.
-
 
  
- 
- 
- 
- 
- 
- 
- 
- 
-You can see the dataset ends in 2015 (at least it did when I wrote this in late 2018).
 
 
-One final way to look at a dataset that you should know is with str(). It will show the structure of the data: How many observations (rows), how many variables (columns), and the first several rows of each variable.
+One final way to look at a dataset that you should know is with glimpse(). It will show the basic outline of the data: How many observations (rows), how many variables (columns), and the first several rows of each variable.
+
+Create another chunk below, this time using Insert->R in the mini-menu just above and to the right (it does exactly the same thing as Code->Insert Chunk), and then use glimpse().
+
 ```{r}
-str(babynames)
+glimpse(babynames)
 ```
 
 
@@ -97,7 +78,7 @@ babynames %>%
   top_n(10, prop)
 ```
 
-This table groups the names weirdly. The male and female names are separate, and the proportions don't go in order. To arrange them in order, use arrange(). And let's change from prop, the proportion of same-sex babies with that name, to n, the raw number of babies with that name.
+This table groups the names weirdly. The male and female names are separate, and the proportions don't go in order. To put them in order, use arrange(). And let's change from prop, the proportion of same-sex babies with that name, to n, the raw number of babies with that name.
 ```{r}
 babynames %>%
   filter(year == 1900) %>% 
@@ -127,7 +108,7 @@ Create a code chunk below and find the top 10 names for your sex and the year yo
 
 
 
-A handy command is mutate(). It creates a new variable. The prop variable is a little hard to read because of the decimal point, so converting it to a percent might make it more readable.
+An important command is mutate(). It creates a new variable. The prop variable is a little hard to read because of the decimal point, so converting it to a percent might make it more readable.
 
 ```{r}
 babynames %>%
@@ -158,7 +139,7 @@ babynames %>%                                   # start with the data set
 ```
 
 
-We can use this rank variable as a measure of the popularity of a particular name. If I want to see how popular Matthew was in 1966, I add another filter() command for my name:
+We can use this rank variable as a measure of the popularity of a particular name. If I want to see how popular Matthew was in 1966, the year I was born, I add another filter() command for my name:
 
 ```{r}
 
@@ -170,9 +151,9 @@ babynames %>%
 
 ```
 
-This shows that Matthew was the 34th most popular boy name in 1966, with 10,809 other babies named Matthew for less than 1% of babies.
+This shows that Matthew was the 34th most popular boy name in 1966, with 10,809 other babies named Matthew for less than 1% of baby boys.
 
-Try this with a few other names, years, and sexes.
+Try this with a few other names, years, and sexes. Just copy-paste the above chunk, and then change the name, year, and sex.
 
 
 
@@ -190,7 +171,6 @@ babynames %>%
   top_n(100, n) %>%            # use only the top names or it could get too big
   wordcloud2()                 # generate the word cloud
 ```
-
 
 
 
@@ -338,7 +318,7 @@ Is it possible to guess the year someone was born by their name? One way to do t
 ```{r}
 babynames %>%                                     # Start with the dataset
   filter(name == "Michele", sex == "F") %>%       # only look at the name you want
-  top_n(1, prop) %>%                              # get the top row by prop to get the most popular year for that name
+  top_n(1, prop)                                  # get the top row by prop to get the most popular year for that name
 
 ```
 
@@ -384,7 +364,7 @@ babynames %>%
   geom_line()
 ```
 
-To get a better look at this, add another line to filter for years only after 1980, with filter(year > 1980).
+To get a better look at this, filter for years only after 1980, with filter(year > 1980).
 
 ```{r}
 babynames %>%
@@ -406,15 +386,16 @@ It looks like Ariel peaked in popularity a few years after Little Mermaid came o
 
 
 
-Assignment: Create a new R Notebook and create a report about your name. You may use someone else's name if you prefer. To do this, click on the File -> New File -> R Notebook menu. Feel free to copy and paste between this notebook and your new project.
+Assignment: Create a new R Notebook and create a report about your name. You may use someone else's name if you prefer. To do this, click on the File -> New File -> R Notebook menu. You should keep the tab with this notebook open so you can see it too. Feel free to copy and paste between this notebook and your new project. 
 
-In the white space around the chunks of code, write a brief description of the analysis and what the results show.
+In the white space around the chunks of code, write a brief description of the analysis and what the results show. Write it so that a friend or family member could read and understand it.
 
 1. Determine its rank the year you were born.  
 2. Create a word cloud of the names of your sex and the year you were born.  
 3. Graph its popularity over time.  
 4. Create a table showing which years it was most popular.  
-5. Graph its popularity in comparison to another name or two (e.g., a sibling, friend, etc.).
+5. Graph its popularity in comparison to another name or two (e.g., a friend, family member, etc.). To keep it simple, use other names of the same sex.
+6. Publish it to RPubs.
 
 
 
