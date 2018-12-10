@@ -5,39 +5,45 @@ output: html_notebook
 
 Get free account at the Pew Research Center: http://www.pewresearch.org/download-datasets/
 
-Once you have your account, from the main page (pewresearch.org) go to datasets, and then Internet, Science, and Tech, and download the  Jan. 3-10, 2018 - Core trends survey. (Here's the page it should be on: http://www.pewinternet.org/dataset/jan-3-10-2018-core-trends-survey/)
+Once you have your account, from the main page (pewresearch.org) go to datasets, and then Internet, Science, and Tech, and download the Jan. 3-10, 2018 - Core trends survey. (Here's the page it should be on: http://www.pewinternet.org/dataset/jan-3-10-2018-core-trends-survey/)
 
-It should download a directory called 
-
+Click on "Download Dataset" and it should download a directory called "Jan. 3-10, 2018 - Core trends survey".
 
 Then upload the file called "January 3-10, 2018 - Core Trends Survey - CSV.csv" to the Files section of R Studio. Make sure to keep the file called "January 3-10, 2018 - Core Trends Survey - Questionnaire.docx" because it has the list of variables and what they mean.
+
+Load the tidyverse package, as we'll be doing for every project.
 
 ```{r}
 library(tidyverse)
 ```
 
 
+This reads in the dataset:
+
 ```{r}
 pew <- read_csv("January 3-10, 2018 - Core Trends Survey - CSV.csv")
 ```
 
-
+Use glimpse() on the pew dataset to get an overview of the data.
 
 ```{r}
-names(pew)
+glimpse(pew)
 ```
 
 
-These variables are mostly coded as numbers, like sex: Male = 1, Female = 2. But these are better represented as factors in R.
+These variables correspond to questions on a survey, like the sex of the respondent. They are mostly coded as numbers, like sex: Male = 1, Female = 2. But these are better represented as factors in R.
 
 You can refer to a variable in a dataframe with a dollar sign: dataframe$var. So to refer to the sex variable in pew: pew$sex.
 
-Change pew$sex to a factor with factor(pew$sex). Then show the levels with levels(pew$sex).
 
 ```{r}
-pew$sex <- factor(pew$sex)
-levels(pew$sex)
 
+pew <- pew %>% 
+  mutate(sex = as.factor(sex))
+
+
+pew %>% 
+  count(sex)
 
 ```
 
@@ -45,10 +51,13 @@ levels(pew$sex)
 We want to change the level names to something more descriptive than 1 and 2. We use fct_recode() to do this. The Questionnaire says 1 = Male and 2 = Female. 
 
 ```{r}
-pew$sex <- fct_recode(pew$sex, "Male" = "1", "Female" = "2")
-levels(pew$sex)
-```
+pew <- pew %>% 
+  mutate(sex = fct_recode(sex, "Male" = "1", "Female" = "2"))
 
+pew %>% 
+  count(sex)
+
+```
 
 
 Here is another variable, called intfreq, which asked "About how often do you use the internet?" Possible responses are 1: Almost constantly, 2: Several times a day, 3: About once a day, 4: Several times a week, 5: Less often, 8: Don't know, 9: Refused to answer. (Those are listed in the Questionnaire document.)
@@ -56,22 +65,33 @@ Here is another variable, called intfreq, which asked "About how often do you us
 First, convert it into a factor and look at the levels:
 
 ```{r}
-pew$intfreq <- factor(pew$intfreq)
-levels(pew$intfreq)
+
+pew <- pew %>% 
+  mutate(intfreq = as.factor(intfreq))
+
+
+pew %>% 
+  count(intfreq)
+
+
 ```
 
-Here is the code for converting each number to a verbal label. You don't have to split the command onto multiple indented lines like I've done, but it makes it easier to read. There are two missing data numbers: 8 for "Don't know" and 9 for "Refused to answer." Let's just get rid of both of those by setting them to NULL. They will appear as missing data which we can exclude later.
+Here is the code for converting each number to a verbal label. You don't have to split the command onto multiple indented lines like I've done, but it makes it easier to read. There are two missing data numbers: 8 for "Don't know" and 9 for "Refused to answer." Let's just get rid of both of those by setting them to NULL. They will appear as missing data which we can exclude later. In addition, let's change the name of the variable to something more meaningful like internet_use.
 
 ```{r}
-pew$intfreq <- fct_recode(pew$intfreq,
-                          "Almost constantly" = "1",
-                          "Several times/day" = "2",
-                          "Once per day" = "3",
-                          "Several times/week" = "4",
-                          "Less than once/day" = "5",
-                          NULL = "8",
-                          NULL = "9")
-levels(pew$intfreq)
+
+pew <- pew %>%
+  mutate(internet_use = fct_recode(intfreq,
+                              "Almost constantly" = "1",
+                              "Several times/day" = "2",
+                              "Once per day" = "3",
+                              "Several times/week" = "4",
+                              "Less than once/day" = "5",
+                              NULL = "8",
+                              NULL = "9"))
+
+pew %>% 
+  count(internet_use)
 ```
 
 
@@ -79,25 +99,25 @@ A very common way to look at survey data is with crosstabs, i.e., one categorica
 
 ```{r}
 pew %>% 
-  count(sex, intfreq)
+  count(sex, internet_use)
 ```
 
 To drop the missing data, use drop_na().
 
 ```{r}
 pew %>% 
-  drop_na(intfreq) %>% 
-  count(sex, intfreq)
+  drop_na(internet_use) %>% 
+  count(sex, internet_use)
 ```
 
 
-A graph would be much easier to read than a table. Take the above code and stick a ggplot bar graph at the end of it.
+A graph would be much easier to read than a table. 
 
 
 ```{r}
 pew %>% 
-  drop_na(intfreq) %>% 
-  ggplot(aes(x = intfreq, fill = sex)) +
+  drop_na(internet_use) %>% 
+  ggplot(aes(x = internet_use, fill = sex)) +
   geom_bar()
 ```
 
@@ -108,8 +128,8 @@ The viridis color palette is considered by most people to be nicer than the defa
 
 ```{r}
 pew %>% 
-  drop_na(intfreq) %>% 
-  ggplot(aes(x = intfreq, fill = sex)) +
+  drop_na(internet_use) %>% 
+  ggplot(aes(x = internet_use, fill = sex)) +
   geom_bar() +
   scale_fill_viridis_d() +
   coord_flip()
@@ -122,8 +142,8 @@ Copy-paste the above chunk below, and then in the parentheses of geom_bar(), put
 
 ```{r}
 pew %>% 
-  drop_na(intfreq) %>% 
-  ggplot(aes(x = intfreq, fill = sex)) +
+  drop_na(internet_use) %>% 
+  ggplot(aes(x = internet_use, fill = sex)) +
   geom_bar(position = "fill") +
   scale_fill_viridis_d() +
   coord_flip()
@@ -137,8 +157,8 @@ Another variation is better for seeing raw numbers rather than proportions:
 
 ```{r}
 pew %>% 
-  drop_na(intfreq) %>% 
-  ggplot(aes(x = intfreq, fill = sex)) +
+  drop_na(internet_use) %>% 
+  ggplot(aes(x = internet_use, fill = sex)) +
   geom_bar(position = "dodge") +
   scale_fill_viridis_d() +
   coord_flip() +
@@ -146,14 +166,13 @@ pew %>%
 ```
 
 
-
 To create side-by-side graphs, one for men and one for women, use facet_wrap(vars(sex)). It creates side-by-side graphs based on whatever variable or variables you put into vars().
 
 In addition, create some better labels with labs(). Include labs(y = "Number of people", x = "How often do you use the internet", title = "Frequency of Internet Usage"). Remember that we flipped the coordinates, so the x and y axes are flipped!
 ```{r}
 pew %>% 
-  drop_na(intfreq) %>% 
-  ggplot(aes(x = intfreq)) +
+  drop_na(internet_use) %>% 
+  ggplot(aes(x = internet_use)) +
   geom_bar() +
   facet_wrap(vars(sex)) +
   coord_flip() +
@@ -161,11 +180,59 @@ pew %>%
   labs(y = "Number of people", x = "How often do you use the internet", title = "Frequency of Internet Usage")
 ```
 
+You might also want to comibne some of the levels. In our example, we might collapse the 5 leves of Internet use down to just 2: More than once per day vs. once per day or less. Use fct_collapse() to do that:
+
+```{r}
+pew <- pew %>% 
+  mutate(internet_use_simple = fct_collapse(internet_use,
+                                 daily_or_less = c("Once per day", "Several times/week", "Less than once/day"),
+                                 more_than_daily = c("Several times/day", "Almost constantly")))
+```
+
+Now re-create the position = "fill" graph from above, but with internet_use_simple.
+
+```{r}
+pew %>% 
+  drop_na(internet_use_simple) %>% 
+  ggplot(aes(x = internet_use_simple, fill = sex)) +
+  geom_bar(position = "fill") +
+  scale_fill_viridis_d() +
+  coord_flip()
+```
+
+
 
 
 Assignment: 
 
+The following variables are in the pew dataset:
+
+web1a: Twitter
+web1b: Instagram
+web1c: Facebook
+web1d: Snapchat
+web1e: Youtube
+
+They are all coded as to whether respondents use that social media site, with ("Yes" = "1", "No" = 2, "Don't know" = "8", "Refused" = "9").
+
+educ2 is the respondents' education level ("Less than HS" = "1", "Some HS" = "2", "HS graduate" = "3", "Some college" = "4", "Associate degree" = "5", "College degree" = "6", "Some grad school" = "7", "Grad degree" = "8", "Don't know" = "98", "Refused" = "99").
+
+When you recode you can use the list of recodings in the parentheses above. I recommend changing the "Don't know" and "Refused" to NULL.
+
+
+1. Choose one of the web1 variables, convert it to a factor, and recode it.
+2. Also convert and recode educ2.  
+3. Create a table of the counts of each variable, and of both simultaneously.    
+4. Create a graph of your choice showing the two variables.  
+5. Collapse educ2 into just two categories of your choice, and re-run the table and graph.  
+6. Publish to RPubs, making sure you present the results with explanation and in an understanble way, including graph titles and labeled axes.
+
+
+
+Here are a few additional variables. You do not need to use these.
+
 home4nw: Do you currently subscribe to internet service at home? 1 = Yes, 2 = No, 8 = Don't know, 9 = Refused
+
 
 Do you use the following social media sites:   (1 = Yes, 2 = No)
 web1a: Twitter
@@ -196,8 +263,6 @@ How about you, personally? Overall, when you add up all the advantages and 	disa
 marital
 1 = Married, 2 = Living with a partner, 3 = Divorced, 4 = Separated, 5 = Widowed, 6 = Never married, 8 = Don't know, 9 = Refused
 
-educ2
-1 = Less than HS, 2 = Some HS, 3 = HS graduate, 4 = Some college, 5 = Associate degree, 6 = College degree, 7 = Some grad school, 8 = Grad degree, 98 = Don't know, 99 = Refused
 
 emplnw
 1 = Employed full time, 2 = Employed part-time, 3 = Retired, 4 = Not employed, 5 = Self-employed, 6 = Disabled, 7 = Student, 8 = Other, 98 = Don't know, 99 = Refused
