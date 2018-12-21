@@ -18,23 +18,30 @@ library(tidyverse)
 ```
 
 
-This reads in the dataset:
+This reads in the dataset after it has been uploaded to Files:
 
 ```{r}
 pew <- read_csv("January 3-10, 2018 - Core Trends Survey - CSV.csv")
 ```
 
-Use glimpse() on the pew dataset to get an overview of the data.
+Use glimpse() on the pew dataset to get an overview of the data. Do that below:
 
 ```{r}
-glimpse(pew)
+
 ```
 
 
-These variables correspond to questions on a survey, like the sex of the respondent. They are mostly coded as numbers, like sex: Male = 1, Female = 2. But these are better represented as factors in R.
+These variables correspond to questions on a survey, like the sex of the respondent. They are mostly coded as numbers, like sex: Male = 1, Female = 2.  
 
-You can refer to a variable in a dataframe with a dollar sign: dataframe$var. So to refer to the sex variable in pew: pew$sex.
+You can refer to a variable in a dataframe with a dollar sign like below:
 
+```{r}
+pew$sex
+```
+
+Categorical variables like these are better represented as factors in R. You can convert a variable into a factor with mutate() and as.factor(). Notice that you need to use the arrow <- to put the new mutated variable back into the original.
+
+Then you can use count() to see how many of each category appear in the variable:
 
 ```{r}
 
@@ -47,8 +54,7 @@ pew %>%
 
 ```
 
-
-We want to change the level names to something more descriptive than 1 and 2. We use fct_recode() to do this. The Questionnaire says 1 = Male and 2 = Female. 
+Next, we want to change the level names to something more descriptive than 1 and 2. The docs say that 1 = Male and 2 = Female. We use fct_recode() to do this. 
 
 ```{r}
 pew <- pew %>% 
@@ -62,24 +68,20 @@ pew %>%
 
 Here is another variable, called intfreq, which asked "About how often do you use the internet?" Possible responses are 1: Almost constantly, 2: Several times a day, 3: About once a day, 4: Several times a week, 5: Less often, 8: Don't know, 9: Refused to answer. (Those are listed in the Questionnaire document.)
 
-First, convert it into a factor and look at the levels:
-
-```{r}
-
-pew <- pew %>% 
-  mutate(intfreq = as.factor(intfreq))
+First, convert it into a factor and look at the levels, and then count the levels.  Create a chunk below and use the same procedure as above to convert sex to a factor and count the levels:   
 
 
-pew %>% 
-  count(intfreq)
 
 
-```
+
+
+
+
+
 
 Here is the code for converting each number to a verbal label. You don't have to split the command onto multiple indented lines like I've done, but it makes it easier to read. There are two missing data numbers: 8 for "Don't know" and 9 for "Refused to answer." Let's just get rid of both of those by setting them to NULL. They will appear as missing data which we can exclude later. In addition, let's change the name of the variable to something more meaningful like internet_use.
 
 ```{r}
-
 pew <- pew %>%
   mutate(internet_use = fct_recode(intfreq,
                               "Almost constantly" = "1",
@@ -102,17 +104,20 @@ pew %>%
   count(sex, internet_use)
 ```
 
-To drop the missing data, use drop_na().
-
-```{r}
-pew %>% 
-  drop_na(internet_use) %>% 
-  count(sex, internet_use)
-```
+To drop the missing data, use drop_na(). Copy and paste the code form the chunk above, and add the line drop_na(internet_use). Don't forget the pipe:
 
 
-A graph would be much easier to read than a table. 
 
+
+
+
+
+
+
+
+**Graph variations**
+
+Next, a graph would be much easier to read than a table. 
 
 ```{r}
 pew %>% 
@@ -126,49 +131,47 @@ The viridis color palette is considered by most people to be nicer than the defa
 2. Flip it so the bars are horizontal by including the line coord_flip() as well.
 
 
-```{r}
-pew %>% 
-  drop_na(internet_use) %>% 
-  ggplot(aes(x = internet_use, fill = sex)) +
-  geom_bar() +
-  scale_fill_viridis_d() +
-  coord_flip()
-```
+
+
+
+
+
+
+
+
+
 
 
 Here's another variation on a bar chart that makes it easy to compare the proportions of females and males in each group. 
 
-Copy-paste the above chunk below, and then in the parentheses of geom_bar(), put position = "fill". 
+Copy-paste the above chunk, and then in the parentheses of geom_bar(), put position = "fill". 
 
-```{r}
-pew %>% 
-  drop_na(internet_use) %>% 
-  ggplot(aes(x = internet_use, fill = sex)) +
-  geom_bar(position = "fill") +
-  scale_fill_viridis_d() +
-  coord_flip()
-```
+
+
+
+
+
+
+
+
 
 
 Another variation is better for seeing raw numbers rather than proportions:
 
-1. In the parentheses of geom_bar(), but position = "dodge" to place the bars right next to one another. 
+1. In the parentheses of geom_bar(), put position = "dodge" to place the bars right next to one another. 
 2. I don't like the gray background in ggplots. To give it a white background, include the line theme_minimal().
 
-```{r}
-pew %>% 
-  drop_na(internet_use) %>% 
-  ggplot(aes(x = internet_use, fill = sex)) +
-  geom_bar(position = "dodge") +
-  scale_fill_viridis_d() +
-  coord_flip() +
-  theme_minimal()
-```
+
+
+
+
+
 
 
 To create side-by-side graphs, one for men and one for women, use facet_wrap(vars(sex)). It creates side-by-side graphs based on whatever variable or variables you put into vars().
 
-In addition, create some better labels with labs(). Include labs(y = "Number of people", x = "How often do you use the internet", title = "Frequency of Internet Usage"). Remember that we flipped the coordinates, so the x and y axes are flipped!
+In addition, create some better labels with labs(). Include labs(y = "Number of people", x = "How often do you use the internet", title = "Frequency of Internet Usage"). Remember that we flipped the coordinates, so the x and y axes are flipped! Run the code below:
+
 ```{r}
 pew %>% 
   drop_na(internet_use) %>% 
@@ -180,30 +183,45 @@ pew %>%
   labs(y = "Number of people", x = "How often do you use the internet", title = "Frequency of Internet Usage")
 ```
 
-You might also want to comibne some of the levels. In our example, we might collapse the 5 leves of Internet use down to just 2: More than once per day vs. once per day or less. Use fct_collapse() to do that:
+
+
+You might also want to combine some of the levels. In our example, we might collapse the 5 leves of Internet use down to just 2: More than once per day vs. once per day or less. Use fct_collapse() to do that. The following code does this and puts it into a new variable called internet_use_simple. 
 
 ```{r}
 pew <- pew %>% 
   mutate(internet_use_simple = fct_collapse(internet_use,
-                                 daily_or_less = c("Once per day", "Several times/week", "Less than once/day"),
-                                 more_than_daily = c("Several times/day", "Almost constantly")))
+                                            daily_or_less = c("Once per day", "Several times/week", "Less than once/day"),
+                                            more_than_daily = c("Several times/day", "Almost constantly")))
+
+pew %>% 
+  count(internet_use_simple)
 ```
 
 Now re-create the position = "fill" graph from above, but with internet_use_simple.
 
-```{r}
-pew %>% 
-  drop_na(internet_use_simple) %>% 
-  ggplot(aes(x = internet_use_simple, fill = sex)) +
-  geom_bar(position = "fill") +
-  scale_fill_viridis_d() +
-  coord_flip()
-```
 
 
 
 
-Assignment: 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+**Assignment**
 
 The following variables are in the pew dataset:
 
