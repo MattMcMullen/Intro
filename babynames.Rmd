@@ -15,6 +15,8 @@ library(wordcloud2)
 
 ```
 
+**Viewing the data**
+
 The package 'babynames' has data on children's names from the Social Security Administration.
 
 First let's look at the data by typing in the name of the package in the chunk below. Then press the little green arrow at the top right of the chunk.
@@ -47,6 +49,8 @@ Create another chunk below, this time using Insert->R in the mini-menu just abov
 
 
 
+
+**Filtering the data and using the pipe**
 
 If you want to see the names for just one year, use filter(). The filter() command will find rows based on some condition, like a year or the sex of a name. Run the chunk below:
 
@@ -106,7 +110,7 @@ Create a code chunk below and find the top 10 names for your sex and the year yo
 
 
 
-
+**Creatig new variables with mutate()**
 
 An important command is mutate(). It creates a new variable. The prop variable is a little hard to read because of the decimal point, so converting it to a percent might make it more readable.
 
@@ -240,7 +244,7 @@ We can also look at a specific name's popularity over time. ggplot is the most c
 ```{r}
 babynames %>%                             # start with the babynames data
   filter(name == "Matthew") %>%           # look only at the name Matthew
-  ggplot(aes(x = year, y = prop)) +       # create a graph with x and y aesthetics set to year and prop 
+  ggplot(aes(x = year, y = prop)) +       # create a graph with x and y aesthetics 
   geom_line()                             # make it a line graph
 
 ```
@@ -300,6 +304,12 @@ babynames %>%
   ggplot(aes(x = year, y = percent)) +
   geom_line()
 ```
+
+
+
+
+
+
 
 
 Let's look at both of my daughter's names in one graph. In filter(), I put both of their names separated by the vertical line |, which is a symbol for OR. Then I set color = name, so the two names will have different color lines.
@@ -391,14 +401,14 @@ It looks like Ariel peaked in popularity a few years after Little Mermaid came o
 
 Create a new R Notebook and create a report about your name. You may use someone else's name if you prefer. To do this, click on the File -> New File -> R Notebook menu. You should keep the tab with this notebook open so you can see it too. Feel free to copy and paste between this notebook and your new project. 
 
-In the white space around the chunks of code, write a brief description of the analysis and what the results show. Write it so that a friend or family member could read and understand it.
+In the white space around the chunks of code, write brief descriptions of the analysis and what the results show. Write it so that a friend or family member could read and understand it.
 
 1. Determine its rank the year you were born.  
 2. Create a word cloud of the names of your sex and the year you were born.  
 3. Graph its popularity over time.  
 4. Create a table showing which years it was most popular.  
 5. Graph its popularity in comparison to another name or two (e.g., a friend, family member, etc.). To keep it simple, use other names of the same sex.
-6. Publish it to RPubs.
+6. Publish it to RPubs. 
 
 
 
