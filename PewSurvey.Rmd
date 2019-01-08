@@ -3,7 +3,7 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-Get free account at the Pew Research Center: http://www.pewresearch.org/download-datasets/
+Get free account at the Pew Research Center: http://www.pewresearch.org/download-datasets/  
 
 Once you have your account, from the main page (pewresearch.org) go to datasets, and then Internet, Science, and Tech, and download the Jan. 3-10, 2018 - Core trends survey. (Here's the page it should be on: http://www.pewinternet.org/dataset/jan-3-10-2018-core-trends-survey/)
 
@@ -27,6 +27,7 @@ pew <- read_csv("January 3-10, 2018 - Core Trends Survey - CSV.csv")
 Use glimpse() on the pew dataset to get an overview of the data. Do that below:
 
 ```{r}
+
 
 ```
 
@@ -54,7 +55,7 @@ pew %>%
 
 ```
 
-Next, we want to change the level names to something more descriptive than 1 and 2. The docs say that 1 = Male and 2 = Female. We use fct_recode() to do this. 
+Next, we want to change the level names to something more descriptive than 1 and 2. The codebook say that 1 = Male and 2 = Female. We use fct_recode() to do this. 
 
 ```{r}
 pew <- pew %>% 
@@ -69,6 +70,7 @@ pew %>%
 Here is another variable, called intfreq, which asked "About how often do you use the internet?" Possible responses are 1: Almost constantly, 2: Several times a day, 3: About once a day, 4: Several times a week, 5: Less often, 8: Don't know, 9: Refused to answer. (Those are listed in the Questionnaire document.)
 
 First, convert it into a factor and look at the levels, and then count the levels.  Create a chunk below and use the same procedure as above to convert sex to a factor and count the levels:   
+
 
 
 
@@ -141,7 +143,6 @@ The viridis color palette is considered by most people to be nicer than the defa
 
 
 
-
 Here's another variation on a bar chart that makes it easy to compare the proportions of females and males in each group. 
 
 Copy-paste the above chunk, and then in the parentheses of geom_bar(), put position = "fill". 
@@ -190,8 +191,11 @@ You might also want to combine some of the levels. In our example, we might coll
 ```{r}
 pew <- pew %>% 
   mutate(internet_use_simple = fct_collapse(internet_use,
-                                            daily_or_less = c("Once per day", "Several times/week", "Less than once/day"),
-                                            more_than_daily = c("Several times/day", "Almost constantly")))
+                                            daily_or_less = c("Once per day", 
+                                                              "Several times/week", 
+                                                              "Less than once/day"),
+                                            more_than_daily = c("Several times/day", 
+                                                                "Almost constantly")))
 
 pew %>% 
   count(internet_use_simple)
@@ -247,7 +251,7 @@ When you recode you can use the list of recodings in the parentheses above. I re
 
 
 
-Here are a few additional variables. You do not need to use these.
+Here are a few additional variables. You do not need to use these, but I had the coding for them so I thought I'd include them for completeness.
 
 home4nw: Do you currently subscribe to internet service at home? 1 = Yes, 2 = No, 8 = Don't know, 9 = Refused
 
