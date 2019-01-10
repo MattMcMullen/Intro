@@ -15,14 +15,14 @@ Get free account at the Pew Research Center: http://www.pewresearch.org/download
 
 Once you have your account, from the main page (pewresearch.org) go to 'datasets,' and then 'Internet, Science, and Tech,' and download the 'Jan. 3-10, 2018 - Core trends survey'. (Here's the page it should be on: http://www.pewinternet.org/dataset/jan-3-10-2018-core-trends-survey/)
 
-Click on "Download Dataset" and it should download a directory called "Jan. 3-10, 2018 - Core trends survey".
+Click on "Download Dataset" and it should download a directory or a .zip file called "Jan. 3-10, 2018 - Core trends survey".
 
-Then upload the file called "January 3-10, 2018 - Core Trends Survey - CSV.csv" to the Files section of R Studio. Do this by clicking the 'Upload' button in the Files window pane on the right.
+Then upload the whole directory to the Files section of R Studio. Do this by clicking the 'Upload' button in the Files window pane on the right.
 
 
 ### R Markdown
 
-Before we get into the analysis, I want to go on a brief diversion into R Markdown.
+Before we get into the analysis, I want to go on a brief diversion into R Markdown. 
 
 Markdown is a way of using plain text to create the kind of advanced formatting you'd normally need a word processor like Microsoft Word to create. It is widely used by people who publish on the internet, like bloggers and web developers. 
 
@@ -32,17 +32,34 @@ Here are some examples of how R Markdown is used to format the text in this note
 
 Symbols like the asterisk are used for *italics* and **bold**. Click Preview above and the text will be rendered in italics and bold and the asterisks will disappear.
 
+1. Do the following:
+
+Put this text in italics.
+
+Put the word bold in bold.
+
+
+
+
 What if you want to show asterisks (or any other special markdown character) around a word? Put backslashes around the special characters, like this \**this is not bold**\.
+
+2. This text will normally create a new header:
+
+## This is a header
+
+Edit the above line so that it does not appear as a header, and the symbols are shown instead.
+
+
+
 
 Here's one that trips me up a lot:
 
-When you hit return to create a new line, your text won't appear on a new line unless you add two spaces to the end of the line:
+When you hit return to create a new line, your text won't appear on a new line unless you add two spaces to the end of the line.
 
-Here is a line ended with two spaces.  
-Here is the next line.
+3. Make sure that the two lines below appear on different lines when previewed:
 
-Here is a line ended with one space. 
-Here is the next line.
+Line one.
+Same line.
 
 
 
@@ -67,13 +84,11 @@ You can center or justify the table contents with colons in the second row:
  :--- | ----: | :---:   
  3.2  | 4.5   | 6.7 
 
-Make a list with indentations and number/letter symbols. Use 4 spaces to make the sub-lists:
 
-1. Personality disorders  
-    A. Antisocial  
-    B. Paranoid  
-    C. Histrionic  
-2. Anxiety disorders
+4. Make a table below with 4 columns labeled Column 1, Column 2, etc., and 3 rows. Put the numbers 1-12 in the cells. Center all the content.
+
+
+
 
 
 The code chunks we have been using are part of R markdown:
@@ -81,20 +96,35 @@ The code chunks we have been using are part of R markdown:
 8 + 7
 ```
 
-You can suppress the code so it runs but does not show when published by putting include=FALSE in the brackets:
+You can suppress the code so it runs and shows the output but does not display any R code when published by putting echo=FALSE in the brackets:
+
+```{r echo=FALSE}
+8 + 7
+```
+
+If you use include=FALSE in the brackets, it will run the code, but not show the output or the code. You might do that if you need to run some calculations for later use but don't want to show those intermediate steps. 
+
+5. Put x <- 3 into a code chunk below, use include=FALSE, and run it below:
+
 
 ```{r include=FALSE}
-x <- 2
-y <- 2
+x <- 3
 ```
 
 
 
-You can insert R code without a chunk by surrounding it in backticks and using the letter r, like this: 2 + 2 + 1 = `r x + y + 1` 
+You can insert R code without a chunk by surrounding it in backticks and using the letter r, like this: 13 squared = `r 13^2`
+
+
+6. Type 116/7 = and then calculate the answer using the method above.
 
 
 
-Those are some of the basics of R Markdown. Now let's get on with the analysis of the Pew data.
+
+Those are some of the basics. See here for a whole book about R Markdown: https://bookdown.org/yihui/rmarkdown/
+
+
+Now let's get on with the analysis of the Pew data.
 
 
 
@@ -108,8 +138,10 @@ Those are some of the basics of R Markdown. Now let's get on with the analysis o
 This reads in the dataset after it has been uploaded to Files:
 
 ```{r}
-pew <- read_csv("January 3-10, 2018 - Core Trends Survey - CSV.csv")
+pew <- read_csv("January 3-10, 2018 - Core Trends Survey/January 3-10, 2018 - Core Trends Survey - CSV.csv")
 ```
+
+
 
 Use glimpse() on the pew dataset to get an overview of the data. Do that below:
 
