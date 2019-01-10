@@ -349,7 +349,7 @@ web1c: Facebook
 web1d: Snapchat
 web1e: Youtube
 
-They are all coded as to whether respondents use that social media site, with ("Yes" = "1", "No" = 2, "Don't know" = "8", "Refused" = "9").
+They are all coded as to whether respondents use that social media site, with ("Yes" = "1", "No" = "2", "Don't know" = "8", "Refused" = "9").
 
 educ2 is the respondents' education level ("Less than HS" = "1", "Some HS" = "2", "HS graduate" = "3", "Some college" = "4", "Associate degree" = "5", "College degree" = "6", "Some grad school" = "7", "Grad degree" = "8", "Don't know" = "98", "Refused" = "99").
 
@@ -361,7 +361,7 @@ When you recode you can use the list of recodings in the parentheses above. I re
 3. Create a table of the counts of each variable, and of both simultaneously.    
 4. Create a graph of your choice showing the two variables.  
 5. Collapse educ2 into just two categories of your choice, and re-run the table and graph.  
-6. Publish to RPubs, making sure you present the results with explanation and in an understanble way, including graph titles and labeled axes.
+6. Publish to RPubs, making sure you present the results with explanation and in an understandable way, including graph titles and labeled axes.
 
 
 
